@@ -1,7 +1,7 @@
 import Model from './model.js';
 import View from './view.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded',async () => {
   const model = new Model();
   const view = new View();
   model.setView(view);

@@ -1,0 +1,28 @@
+
+### get todos
+GET http://localhost:3000/api/todo HTTP/1.1
+
+### create todo
+POST http://localhost:3000/api/todo HTTP/1.1
+content-type: application/json
+
+{
+  "title": "Test Todo",
+  "description": "This is a test",
+  "completed": false
+}
+
+### update todo
+
+PUT http://localhost:3000/api/todo/1 HTTP/1.1
+content-type: application/json
+
+{
+  "title": "Test update Todo",
+  "description": "This is a test",
+  "completed": true
+}
+
+### delete todo
+
+DELETE http://localhost:3000/api/todo/1 HTTP/1.1

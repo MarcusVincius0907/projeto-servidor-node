@@ -1,20 +1,8 @@
 export default class Model {
   constructor() {
+    this.url = "/todo";
     this.view = null;
-    this.todos = JSON.parse(localStorage.getItem('todos'));
-    if (!this.todos || this.todos.length < 1) {
-      this.todos = [
-        {
-          id: 0,
-          title: 'Learn JS',
-          description: 'Watch JS Tutorials',
-          completed: false,
-        }
-      ]
-      this.currentId = 1;
-    } else {
-      this.currentId = this.todos[this.todos.length - 1].id + 1;
-    }
+   
   }
 
   setView(view) {
@@ -22,48 +10,59 @@ export default class Model {
   }
 
   save() {
-    localStorage.setItem('todos', JSON.stringify(this.todos));
+    localStorage.setItem("todos", JSON.stringify(this.todos));
   }
 
-  getTodos() {
-    return this.todos.map((todo) => ({...todo}));
+  async getTodo() {
+    return await fetch(this.url)
+      .then((res) => res.json())
+      .then((res) => res);
   }
 
   findTodo(id) {
     return this.todos.findIndex((todo) => todo.id === id);
   }
 
-  toggleCompleted(id) {
-    const index = this.findTodo(id);
-    const todo = this.todos[index];
-    todo.completed = !todo.completed;
-    this.save();
+  toggleCompleted(values) {
+    values.completed = !values.completed
+    this.editTodo(values.id, values)
   }
 
-  editTodo(id, values) {
-    const index = this.findTodo(id);
-    Object.assign(this.todos[index], values);
-    this.save();
+  async editTodo(id, values) {
+    const resp = await fetch(this.url + `/${id}`, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      method: "PUT",
+      body: JSON.stringify({ ...values }),
+    })
+      .then((res) => res.json())
+      .then((res) => res);
+
+
+    return { ...resp.todosList };
   }
 
-  addTodo(title, description) {
-    const todo = {
-      id: this.currentId++,
-      title,
-      description,
-      completed: false,
-    }
+  async addTodo(title, description) {
+    const resp = await fetch(this.url, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify({ title, description }),
+    })
+      .then((res) => res.json())
+      .then((res) => res);
 
-    this.todos.push(todo);
-    console.log(this.todos);
-    this.save();
 
-    return {...todo};
+    return { ...resp.todosList };
   }
 
-  removeTodo(id) {
-    const index = this.findTodo(id);
-    this.todos.splice(index, 1);  
-    this.save();
+  async removeTodo(id) {
+    return await fetch(this.url + `/${id}`, {method: 'DELETE'})
+      .then((res) => res.json())
+      .then((res) => res);
   }
 }
